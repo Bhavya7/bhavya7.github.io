@@ -1,0 +1,192 @@
+﻿@model SampleProject_BusinessEntities.Users
+
+@{
+    ViewBag.Title = "ViewProfile";
+}
+
+<h2>ViewProfile</h2>
+
+<div>
+    <h4>Users</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.EmailID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EmailID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Mobile)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Mobile)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Gender)
+        </dt>
+
+        <dd>
+            @if (Model.Gender == true)
+            {
+                @: Male
+            }
+            else
+            {
+                @: Female
+            }
+
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DOB)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DOB)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.RoleID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RoleID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.RoleName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RoleName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.StateName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StateName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CityName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CityName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.StateID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StateID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CityID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CityID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.User_ID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.User_ID)
+        </dd>
+
+        <dd>
+            <img src="~/Profile_Images/@Model.FileName" width="300" height="300" />
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @*@Html.ActionLink("Edit", "Edit_Profile", new { id = Model.User_ID }, new { @class = "editDialog" }) |*@
+   <a href="@Url.Action("EditUser","Shared", new { UserID =  Model.User_ID, @class = "editDialog" })" >Update Profile</a> |
+    <a href="@Url.Action("ChangePassword","Shared", new { UserID = Model.User_ID })">Change Password</a>
+</p>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $(function () {
+            $("#dialog").dialog({
+                autoOpen: false,
+                show: {
+                    effect: "shake",
+                    duration: 1000
+                },
+                hide: {
+                    effect: "explode",
+                    duration: 1000
+                }
+            });
+            $(".editDialog").click(function (e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+                alert(url);
+                $.ajax({
+                    url: this.href,
+                    type: 'GET',
+                    cache: false,
+                    success: function (result) {
+                        $("#dialog").dialog("open");
+                        $("#dialog").html(result);
+                        $("#dialog").show();
+                    }
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            $(document).on("click", '#btnSubmit', function () {
+
+                var Name, Dob, Mobile, State, City;
+
+                Name = $('#txtName').val();
+                Dob = $('#txtDob').val();
+                Mobile = $('#txtMobile').val();
+                State = $('#ddlState').val();
+                City = $('#ddlCity').val();
+                Password = $('#txtPassword').val();
+                //ajax for post data
+                $.ajax({
+                    url: "@Url.Action("EditUser","Shared")",
+                    type: "post",
+                    data: { NAME: Name, DOB: Dob, MOBILE: Mobile, STATE: State, CITY: City, PASSWORD: Password },
+                    datatype: JSON,
+                    success: function (result) {
+                        if (result == 'sucMsg')
+                        {
+                            $('#sucMsg').text('sucessfully updated')
+                        }
+                        else if (result == 'Error')
+                        {
+                            $('#Error').text('Failed')
+                        }
+                    }
+                });
+            });
+        });
+
+    </script>
+}

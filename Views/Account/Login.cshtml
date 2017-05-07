@@ -1,0 +1,58 @@
+﻿@model SampleProject_BusinessEntities.LoginModel
+
+
+@{
+    ViewBag.Title = "Log in";
+}
+
+<h2>@ViewBag.Title.</h2>
+
+@using (Html.BeginForm("Login", "Account", FormMethod.Post))
+{
+
+    <div class="row">
+        <div class="col-md-8">
+            @Html.AntiForgeryToken()
+            <h4>Use a local account to log in.</h4>
+            <hr />
+
+            <div class="form-group">
+                <div class="col-md-2">
+                    User ID
+                </div>
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.User_ID, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.User_ID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-2">
+                    Password
+                </div>
+                @*@Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })*@
+                <div class="col-md-10">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Log in" class="btn btn-default" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10" style="color:green">
+                    @ViewBag.Message
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

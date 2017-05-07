@@ -1,0 +1,285 @@
+﻿@using System.Web.Optimization
+@using PagedList.Mvc;
+@model PagedList.IPagedList<SampleProject_BusinessEntities.Users>
+<link href="~/Content/PagedList.css" rel="stylesheet" />
+@{
+    ViewBag.Title = "ShowAllUserDetails";
+}
+
+<h2>ShowAllUserDetails</h2>
+
+<p>
+    <a href="@Url.Action("CreateUser")">Create User</a>
+</p>
+@using (Html.BeginForm("ShowAllUserDetails", "Administrator", FormMethod.Get))
+{
+    <p>
+        Search for : @Html.TextBox("Search_Data", ViewBag.FilterValue as string)
+        <input type="submit" value="Find" />
+    </p>
+}
+@if (Model.Count > 0)
+{
+    <table class="table">
+        <tr>
+            <th>
+                EmailID
+            </th>
+            <th>
+                @Html.ActionLink("Name", "ShowAllUserDetails", new { SortBy = ViewBag.SortName, Filter_Value = ViewBag.FilterValue })
+            </th>
+            <th>
+                Mobile
+            </th>
+            <th>
+                Gender
+            </th>
+            <th>
+                DOB
+            </th>
+            <th>
+                Role
+            </th>
+            <th>
+                StateName
+            </th>
+            <th>
+                CityName
+            </th>
+            <th>
+                Status
+            </th>
+            <th>
+                User_ID
+            </th>
+            @*<th>
+                    Password
+                </th>*@
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmailID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Mobile)
+                </td>
+                <td>
+                    @if (item.Gender == true)
+                    {
+                        @:Male
+                    }
+                    else
+                    {
+                        @:Female
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DOB)
+                </td>
+                <td>
+                    @if (item.RoleID == 1)
+                    {
+                        @:Administrator
+                    }
+                    else if (item.RoleID == 2)
+                    {
+                        @:Employee
+                    }
+                    else if (item.RoleID == 3)
+                    {
+                        @:Supervisor
+                    }
+                </td>
+                <td>
+                    @if (item.StateID == 1)
+                    {
+                        @:AP
+                    }
+                    else
+                    {
+                        @:Telangana
+                    }
+                </td>
+                <td>
+                    @if (item.CityID == 1)
+                    {
+                        @:Vijayawada
+                    }
+                    else if (item.CityID == 2)
+                    {
+                        @:Vizag
+                    }
+                    else if (item.CityID == 3)
+                    {
+                        @:Hyderadbad
+                    }
+                    else if (item.CityID == 4)
+                    {
+                        @:Secunderadbad
+                    }
+                </td>
+                <td>
+                    @if (item.Status == true)
+                    {
+                        @:Active
+                    }
+                    else
+                    {
+                        @:Inactive
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User_ID)
+                </td>
+                @*<td>
+                        @Html.DisplayFor(modelItem => item.Password)
+                    </td>*@
+
+                <td>
+                    <a href="@Url.Action("EditUser", "Shared", new { UserID = item.User_ID })">Edit User</a> |
+                    <a href="@Url.Action("ViewProfile", "Shared", new { UserID = item.User_ID })">View Details</a> |
+
+                    @*<a href="@Url.Action("Delete", "Administrator", new { id = item.User_ID },new { @class = "deleteDialog" })">Delete Data</a>*@
+                    @*@Html.ActionLink("Delete Record", "Delete", new { id = item.User_ID }, new { @class = "deleteDialog" })*@
+
+                    <a href="#" data-id="@item.ID" data-record-title="Delete" data-toggle="modal" class="delete" data-target="#confirm-delete">Delete</a>
+                </td>
+            </tr>
+        }
+    </table>
+}
+else
+{
+    @:NO DATA FOUND
+}
+<br />
+    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+    @Html.PagedListPager(Model, Page_No => Url.Action("ShowAllUserDetails",
+    new { Page_No, SortBy = ViewBag.CurrentSortOrder, Filter_Value = ViewBag.FilterValue }))
+
+    <div id="edit_dialog" title="Edit here" />
+
+    <!-- set up the modal to start hidden and fade in and out -->
+    <div id="confirm-delete" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                    <h4 class="modal-title" id="myModalLabel">Confirmation Message</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" class="hiddenid" />
+                    <p>Are you sure you want to delete this record?</p>
+                </div>
+                <!-- dialog buttons -->
+                <div class="modal-footer">
+                    <button type="button" id="btnDelete" class="btn btn-primary">Yes</button>
+                    @*<button type="button" class="close btn-primary" data-dismiss="modal">No</button>*@
+                    <button type="button" data-dismiss="modal" aria-hidden="true" class="btn secondary">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="details_dialog" title="Details" />
+
+    @section scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+        <script type="text/javascript">
+
+            $(document).on("click", ".delete", function () {
+                var passedID = $(this).data('id');
+                $(".modal-body .hiddenid").val(passedID);
+            });
+
+            $('#btnDelete').click(function (e) {
+                //delete ajax call
+                alert($('.hiddenid').val());
+                e.preventDefault();
+                $.ajax({
+                    type: "GET",
+                    url: "@Url.Action("Delete", "Administrator")",
+                    dataType: "json",
+                    //data: { id: passedID },
+                    data: { id: $('.hiddenid').val() },
+                    success: function (result) {
+                        
+                        if (result == 1) {
+                            alert("Deleted record");
+                            setTimeout(function () {
+                                location.reload();
+                            }, 3000);
+                        }
+                        else {
+                            alert("Failed");
+                        }
+                    }
+                });
+            });
+
+            $(function () {
+                $("#edit_dialog").dialog({
+                    autoOpen: false,
+                    show: {
+                        effect: "shake",
+                        duration: 1000
+                    },
+                    hide: {
+                        effect: "explode",
+                        duration: 1000
+                    }
+                });
+                $(".editDialog").click(function (e) {
+                    e.preventDefault();
+                    var url = $(this).attr('href');
+                    $.ajax({
+                        url: this.href,
+                        type: 'GET',
+                        cache: false,
+                        success: function (result) {
+                            $("#dialog").dialog("open");
+                            $("#dialog").html(result);
+                            $("#dialog").show();
+                        }
+                    });
+                });
+            });
+
+            $(function () {
+                $("#details_dialog").dialog({
+                    autoOpen: false,
+                    show: {
+                        effect: "blind",
+                        duration: 1000
+                    },
+                    hide: {
+                        effect: "explode",
+                        duration: 1000
+                    }
+                });
+                $(".detailsDialog").click(function (e) {
+                    e.preventDefault();
+                    var url = $(this).attr('href');
+                    alert(url);
+                    $.ajax({
+                        url: this.href,
+                        type: 'GET',
+                        cache: false,
+                        success: function (result) {
+                            $("#details_dialog").dialog("open");
+                            $("#details_dialog").html(result);
+                            $("#details_dialog").show();
+                        }
+                    });
+                });
+            });
+        </script>
+    }
+
