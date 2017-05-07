@@ -1,0 +1,196 @@
+﻿@model SampleProject_BusinessEntities.Users
+
+@{
+    ViewBag.Title = "CreateUser";
+}
+
+<h2>CreateUser</h2>
+
+
+@using (Html.BeginForm("CreateUser", "Administrator", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.EmailID, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.EmailID, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.EmailID, "", new { @class = "text-danger" })
+                <span id="msgEmail"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Mobile, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Mobile, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Mobile, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Gender, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("Gender", new List<SelectListItem> { new SelectListItem { Text = "Male", Value = "True" }, new SelectListItem { Text = "Female", Value = "False" } }, "Select Gender", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Gender, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DOB, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DOB, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.DOB, "", new { @class = "text-danger" })
+                <span id="display_error"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.RoleID, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.RoleID, @ViewBag.Roles as SelectList, "Select Role", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.RoleID, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.StateID, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.StateID, @ViewBag.States as SelectList, "Select State", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.StateID, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CityID, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.CityID, new SelectList(Enumerable.Empty<SelectListItem>(), "CityId", "Cityname"), "Select city", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.CityID, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.User_ID, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.User_ID, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.User_ID, "", new { @class = "text-danger" })
+                <span id="msgUser_ID"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10" style="color:green">
+                @ViewBag.Message
+            </div>
+        </div>
+
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "ShowAllUserDetails")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/jscript">
+        $('#StateID').change(function () {
+            $.getJSON('/Shared/CityList/' + $('#StateID').val(), function (data) {
+                //  alert();
+                var items = '<option>Select a City</option>';
+                $.each(data, function (i, city) {
+                    // alert(city);
+                    items += "<option value='" + city.Value + "'>" + city.Text + "</option>";
+                });
+                $('#CityID').html(items);
+            });
+        });
+
+        $('#EmailID').change(function () {
+            //alert($('#EmailID').val());
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("IsEmailAvailable", "Administrator")",
+                data: { EmailID: $('#EmailID').val() },
+                dataType: "json",
+                success: function (data) {
+                    alert("Data Returned: " + data);
+                    if (data == 1) {
+                        $('#EmailID').val('');
+                        $("#msgEmail").text('Email Id already exist');
+                        return false;
+                    }
+                    else {
+                        $("#msgEmail").text('');
+
+                    }
+                }
+            });
+        });
+
+        $('#User_ID').change(function () {
+            // alert($('#User_ID').val());
+
+            $.ajax({
+                type: "GET",
+                url: "Administrator/IsUser_IDAvailable/",
+                data: { id: $('#User_ID').val() },
+                dataType: "json",
+                error: function (xhr, status, error) {
+                    // you may need to handle me if the json is invalid
+                    // this is the ajax object
+                },
+                success: function (data) {
+                    alert(data);
+                    if (data > 0) {
+                        $('#User_ID').val('');
+                        $("#msgUser_ID").text('User_ID already exists');
+                        return false;
+                    }
+                    else {
+                        $("#msgUser_ID").text('');
+
+                    }
+                }
+            });
+        });
+        $("#DOB").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: '-115:+1M',
+            maxDate: new Date(),
+        }).on('change', function () {
+            var selYear = new Date($(this).val()).getFullYear(); // get the full year of selected date
+            var currYear = new Date().getFullYear(); // get the current year
+            //alert(currYear - selYear);
+            if ((currYear - selYear) < 20) {
+                //alert("error");
+                $("#display_error").show();
+                $("#display_error").text('please select valid date');
+            }
+            else {
+                $("#display_error").hide();
+            }
+        });
+    </script>
+
+}
+
